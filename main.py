@@ -14,6 +14,16 @@ from PIL import ExifTags
 from PIL import Image
 
 
+def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+    """
+    Копируем файлы в директорию.
+    """
+    for root, dirs, files in os.walk(start_dir):
+        for file in files:
+            path = f"{root}{os.sep}{file}"
+            shutil.copy2(path, finish_dir)
+
+
 def create_directory(dir_name: str) -> None:
     """
     Создаём директорию.
@@ -46,38 +56,46 @@ def get_metadates(file_name: str) -> str | None:
     return exif.get('DateTime')
 
 
-def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+def get_extensions(file_name: str) -> str:
     """
-    Копируем файлы в директорию.
+    Получаем расширения файлов.
     """
-    for root, dirs, files in os.walk(start_dir):
-        for file in files:
-            path = f"{root}{os.sep}{file}"
-            shutil.copy2(path, finish_dir)
+    return file_name.split('.')[-1].lower()
+
+
+def _checking_metadata(file_name: str) -> bool:
+    """
+    Проверка файла на метаданные.
+    """
+    list_extensions = ['jpeg', 'png', 'jpg']
+    return get_extensions(file_name=file_name) in list_extensions \
+           and get_metadates(file_name=file_name) is not None
 
 
 def main():
     start_path = r"C:\Users\User\Desktop\фото Еська"
     finish_path = r"C:\Users\User\Desktop\test"
     # Копируем файлы.
-    # copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
+    copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
 
     os.chdir(finish_path)
+
     for root, dirs, files in os.walk(finish_path):
         for file in files:
             path = f"{root}{os.sep}{file}"
 
-            metadates_none = get_metadates(file_name=path) is None
-            if metadates_none:
-                year = get_dates(path).strftime("%Y")
-                month = get_dates(path).strftime("%B")
-            else:
+            # Получаем метаданные с фото.
+            metadates_true = _checking_metadata(file_name=path)
+            if metadates_true:
                 pattern = '%Y:%m:%d %H:%M:%S'
                 dt = datetime.strptime(get_metadates(file_name=path), pattern)
                 year = str(dt.year)
                 month = dt.strftime("%B")
+            else:
+                year = get_dates(path).strftime("%Y")
+                month = get_dates(path).strftime("%B")
 
             create_directory(year)
             os.chdir(f"{finish_path}{os.sep}{year}")
