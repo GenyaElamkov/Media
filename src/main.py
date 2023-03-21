@@ -14,22 +14,6 @@ from datetime import datetime
 from PIL import ExifTags
 from PIL import Image
 
-
-def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
-    """
-    Копируем файлы в директорию.
-    """
-    # TODO: Не копирует файлы с одинаковыми именами.
-    os.chdir(start_dir)
-    for root, dirs, files in os.walk(start_dir):
-        for file in files:
-            path = os.path.join(root, file)
-            try:
-                shutil.copy2(path, finish_dir)
-            except shutil.SameFileError:
-                print('Копия')
-
-
 def create_directory(dir_name: str) -> None:
     """
     Создаём директорию.
@@ -37,6 +21,21 @@ def create_directory(dir_name: str) -> None:
     dir_true = os.path.isdir(dir_name)
     if not dir_true:
         os.mkdir(dir_name)
+
+def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+    """
+    Копируем файлы в директорию.
+    """
+    for root, dirs, files in os.walk(start_dir):
+        for file in files:
+            path = os.path.join(root, file)
+            copy_path = os.path.join(finish_dir, file)
+
+            if os.path.isfile(copy_path):
+                new_name = str(len(os.listdir(finish_dir))) + file
+                copy_path = os.path.join(finish_dir, new_name)
+
+            shutil.copy2(path, copy_path)
 
 
 def get_dates(file_name: str) -> datetime:
@@ -77,7 +76,7 @@ def _checking_metadata(file_name: str) -> bool:
 
 
 def main():
-    start_path = r"C:\Users\User\Desktop\фото_Еська"
+    start_path = r"C:\Users\User\Desktop\фото_Еська\Катюша"
     # start_path = input("Скопируйте сюда путь к фото: ")
     # Текущая директория.
     # start_path = os.getcwd()
