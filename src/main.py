@@ -18,21 +18,24 @@ def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
     """
     Копируем файлы в директорию.
     """
+    # TODO: Не копирует файлы с одинаковыми именами.
+    os.chdir(start_dir)
     for root, dirs, files in os.walk(start_dir):
         for file in files:
-            path = f"{root}{os.sep}{file}"
-            shutil.copy2(path, finish_dir)
+            path = os.path.join(root, file)
+            try:
+                shutil.copy2(path, finish_dir)
+            except shutil.SameFileError:
+                print('Копия')
 
 
 def create_directory(dir_name: str) -> None:
     """
     Создаём директорию.
     """
-    # if not os.path.exists(dir_name):
-    #     os.makedirs(dir_name)
     dir_true = os.path.isdir(dir_name)
     if not dir_true:
-        os.makedirs(dir_name)
+        os.mkdir(dir_name)
 
 
 def get_dates(file_name: str) -> datetime:
@@ -73,8 +76,18 @@ def _checking_metadata(file_name: str) -> bool:
 
 
 def main():
-    start_path = r"C:\Users\User\Desktop\фото Еська"
-    finish_path = r"C:\Users\User\Desktop\test"
+    # start_path = r"C:\Users\User\Desktop\фото_Еська"
+    start_path = input("Скопируйте сюда путь к фото: ")
+    # Текущая директория.
+    # start_path = os.getcwd()
+    os.chdir(start_path)
+
+    # Директория куда складываем файлы.
+    finish_dir = 'NewFile'
+    create_directory(finish_dir)
+
+    # Путь куда складываем файлы.
+    finish_path = os.path.join(start_path, finish_dir)
     # Копируем файлы.
     copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
 
@@ -82,10 +95,9 @@ def main():
 
     os.chdir(finish_path)
 
-    for root, dirs, files in os.walk(finish_path):
+    for root, dirs, files in os.walk("."):
         for file in files:
-            path = f"{root}{os.sep}{file}"
-
+            path = os.path.join(root, file)
             # Получаем метаданные с фото.
             metadates_true = _checking_metadata(file_name=path)
             if metadates_true:
@@ -98,15 +110,15 @@ def main():
                 month = get_dates(path).strftime("%B")
 
             create_directory(year)
-            os.chdir(f"{finish_path}{os.sep}{year}")
+            os.chdir(year)
 
             create_directory(month)
-            os.chdir(finish_path)
+            os.chdir('..')
 
             try:
-                shutil.move(file, f"{year}{os.sep}{month}{os.sep}{file}")
+                shutil.move(file, os.path.join(year, month, file))
             except FileNotFoundError:
-                print('[!] Файлов нет')
+                print('[!] Файл перенесен')
 
 
 if __name__ == '__main__':
