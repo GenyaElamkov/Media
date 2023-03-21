@@ -4,6 +4,9 @@
 Информацию берез из метаданных файла: дата съемки.
 Если отсутствует дата съемки, то время последней модификации
 файла (дата создания).
+--Help--
+Разместите скрипт в корне каталога.
+В корне каталога фотографии должны находится в директориях (папках).
 """
 
 import locale
@@ -60,7 +63,7 @@ def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
 
 def get_dates(file_name: str) -> datetime:
     """
-    Получаем дату создания с файла.
+    Получаем дату создания файла.
     """
     dt = os.path.getmtime(file_name)
     return datetime.fromtimestamp(dt)
@@ -68,7 +71,7 @@ def get_dates(file_name: str) -> datetime:
 
 def get_metadates(file_name: str) -> str | None:
     """
-    Получаем дату с метаданных файла.
+    Получаем дату метаданных файла.
     """
     with Image.open(file_name) as img:
         exif = {
@@ -94,17 +97,16 @@ def work(start_path: str, finish_path: str) -> None:
     copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
+    pattern = '%Y:%m:%d %H:%M:%S'
 
     os.chdir(finish_path)
 
     for root, dirs, files in os.walk("."):
         for file in files:
             path = os.path.join(root, file)
-
             # Получаем метаданные с фото.
             metadates_true = _checking_metadata(file_name=path)
             if metadates_true:
-                pattern = '%Y:%m:%d %H:%M:%S'
                 dt = datetime.strptime(get_metadates(file_name=path), pattern)
                 year = str(dt.year)
                 month = dt.strftime("%B")
@@ -127,13 +129,13 @@ def work(start_path: str, finish_path: str) -> None:
 
 def main() -> None:
     # Текущая директория.
-    start_path = r"C:\Users\User\Desktop\фото_Еська\Катюша"
-    # start_path = input("Скопируйте сюда путь к фото: ")
-    # start_path = os.getcwd()
+    # start_path = r"C:\Users\User\Desktop\фото_Еська"
+    start_path = os.getcwd()
     os.chdir(start_path)
 
     # Директория куда складываем файлы.
-    finish_dir = 'NewFolder'
+    dts_now = datetime.now().date().strftime('%d.%m.%Y')
+    finish_dir = 'NewFolder' + f"_{dts_now}"
     create_directory(finish_dir)
     finish_path = os.path.join(start_path, finish_dir)
 
