@@ -23,6 +23,8 @@ from datetime import datetime
 
 from PIL import ExifTags
 from PIL import Image
+from PIL import UnidentifiedImageError
+from tqdm import tqdm
 
 
 def create_directory(dir_name: str) -> None:
@@ -75,8 +77,7 @@ def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
     list_dir - [root - путь к файлу, file - имя файла]
     finish_dir - куда сохранить файлы.
     """
-    for root, file in list_dir:
-        print(root, file)
+    for root, file in tqdm(list_dir, ncols=80):
         path = os.path.join(root, file)
         copy_path = os.path.join(finish_dir, file)
 
@@ -105,7 +106,7 @@ def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
 #
 #                 # Копируем файлы.
 #                 shutil.copy2(path, copy_path)
-
+#
 
 def get_dates(file_name: str) -> datetime:
     """
@@ -119,13 +120,18 @@ def get_metadates(file_name: str) -> str | None:
     """
     Получаем дату метаданных файла.
     """
-    with Image.open(file_name) as img:
-        exif = {
-            ExifTags.TAGS[k]: v
-            for k, v in img.getexif().items()
-            if k in ExifTags.TAGS
-        }
-    return exif.get('DateTime')
+
+
+    try:
+        with Image.open(file_name) as img:
+            exif = {
+                ExifTags.TAGS[k]: v
+                for k, v in img.getexif().items()
+                if k in ExifTags.TAGS
+            }
+        return exif.get('DateTime')
+    except UnidentifiedImageError:
+        return None
 
 
 def _checking_metadata(file_name: str) -> bool:
@@ -142,6 +148,7 @@ def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
     start_path_file_name = get_list_acceptable_files(start_dir=start_path)
     copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
+    # copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
