@@ -56,29 +56,21 @@ def progress_bar() -> None:
     """
 
 
-def get_list_acceptable_files(start_dir: str) -> list:
-    """
-    Создаём лист допустимых файлов.
-    """
-    for root, dirs, files in os.walk(start_dir):
-        return [file for file in files if not _set_except_extensions(file)]
-
-
 def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
     """
     Копируем файлы в директорию.
     """
     for root, dirs, files in os.walk(start_dir):
         for file in files:
-            path = os.path.join(root, file)
-            copy_path = os.path.join(finish_dir, file)
-
-            if os.path.isfile(copy_path):
-                new_name = str(len(os.listdir(finish_dir))) + file
-                copy_path = os.path.join(finish_dir, new_name)
-
-            # Проверяем на расширения из списка исключений.
             if not _set_except_extensions(file):
+                path = os.path.join(root, file)
+                copy_path = os.path.join(finish_dir, file)
+
+                if os.path.isfile(copy_path):
+                    new_name = str(len(os.listdir(finish_dir))) + file
+                    copy_path = os.path.join(finish_dir, new_name)
+
+                # Проверяем на расширения из списка исключений.
                 shutil.copy2(path, copy_path)
 
 
@@ -115,7 +107,6 @@ def _checking_metadata(file_name: str) -> bool:
 
 def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
-    get_list_acceptable_files(start_dir=start_path)
     copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
