@@ -23,7 +23,9 @@ from datetime import datetime
 
 from PIL import ExifTags
 from PIL import Image
+from PIL import UnidentifiedImageError
 from tqdm import tqdm
+
 
 def create_directory(dir_name: str) -> None:
     """
@@ -46,7 +48,7 @@ def _set_except_extensions(file_name) -> bool:
     Устанавливаем исключения для расширений.
     Расширения в этом списке не копируются.
     """
-    excep = ['exe', 'psd']
+    excep = ['exe', 'psd', 'thm']
     return get_extensions(file_name) in excep
 
 
@@ -55,29 +57,56 @@ def progress_bar() -> None:
     Показываем прогресс бар.
     """
 
-def test(start_dir: str) -> list:
-    for root, dirs, files in os.walk(start_dir):
-        arr_file = [file for file in files if not _set_except_extensions(file)]
 
-    return arr_file
-
-def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+def get_list_acceptable_files(start_dir: str) -> list:
     """
-    Копируем файлы в директорию.
+    Получаем список разрешенных файлов.
+    :return [root - путь к файлу, file - имя файла]
     """
+    arr = []
     for root, dirs, files in os.walk(start_dir):
         for file in files:
-            path = os.path.join(root, file)
-            copy_path = os.path.join(finish_dir, file)
-
-            if os.path.isfile(copy_path):
-                new_name = str(len(os.listdir(finish_dir))) + file
-                copy_path = os.path.join(finish_dir, new_name)
-
-            # Проверяем на расширения из списка исключений.
             if not _set_except_extensions(file):
-                shutil.copy2(path, copy_path)
+                arr.append([root, file])
+    return arr
 
+
+def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
+    """
+    Копируем файлы в директорию.
+    list_dir - [root - путь к файлу, file - имя файла]
+    finish_dir - куда сохранить файлы.
+    """
+    for root, file in tqdm(list_dir, ncols=80, desc='Copy'):
+        path = os.path.join(root, file)
+        copy_path = os.path.join(finish_dir, file)
+
+        if os.path.isfile(copy_path):
+            new_name = str(len(os.listdir(finish_dir))) + file
+            copy_path = os.path.join(finish_dir, new_name)
+
+        # Копируем файлы.
+        shutil.copy2(path, copy_path)
+
+
+# def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+#     """
+#     Копируем файлы в директорию.
+#     """
+#     for root, dirs, files in os.walk(start_dir):
+#         for file in files:
+#             # Проверяем на расширения из списка исключений.
+#             if not _set_except_extensions(file):
+#                 path = os.path.join(root, file)
+#                 copy_path = os.path.join(finish_dir, file)
+#
+#                 if os.path.isfile(copy_path):
+#                     new_name = str(len(os.listdir(finish_dir))) + file
+#                     copy_path = os.path.join(finish_dir, new_name)
+#
+#                 # Копируем файлы.
+#                 shutil.copy2(path, copy_path)
+#
 
 def get_dates(file_name: str) -> datetime:
     """
@@ -91,13 +120,17 @@ def get_metadates(file_name: str) -> str | None:
     """
     Получаем дату метаданных файла.
     """
-    with Image.open(file_name) as img:
-        exif = {
-            ExifTags.TAGS[k]: v
-            for k, v in img.getexif().items()
-            if k in ExifTags.TAGS
-        }
-    return exif.get('DateTime')
+
+    try:
+        with Image.open(file_name) as img:
+            exif = {
+                ExifTags.TAGS[k]: v
+                for k, v in img.getexif().items()
+                if k in ExifTags.TAGS
+            }
+        return exif.get('DateTime')
+    except UnidentifiedImageError:
+        return None
 
 
 def _checking_metadata(file_name: str) -> bool:
@@ -112,9 +145,8 @@ def _checking_metadata(file_name: str) -> bool:
 
 def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
-    test(start_dir=start_path)
-    copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
-
+    start_path_file_name = get_list_acceptable_files(start_dir=start_path)
+    copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
@@ -122,7 +154,7 @@ def work(start_path: str, finish_path: str) -> None:
     os.chdir(finish_path)
 
     for root, dirs, files in os.walk("."):
-        for file in files:
+        for file in tqdm(files, ncols=80, desc='Move'):
             # Получаем метаданные с фото.
             metadates_true = _checking_metadata(file_name=file)
             if metadates_true:
@@ -149,7 +181,7 @@ def work(start_path: str, finish_path: str) -> None:
 def main() -> None:
     # Текущая директория.
     # Тестовый путь
-    start_path = r"C:\Users\User\Desktop\фото_Еська"
+    start_path = r"C:\Users\User\Desktop\test"
     # Путь для pruduct.
     # start_path = os.getcwd()
     os.chdir(start_path)
