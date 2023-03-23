@@ -48,7 +48,7 @@ def _set_except_extensions(file_name) -> bool:
     Устанавливаем исключения для расширений.
     Расширения в этом списке не копируются.
     """
-    excep = ['exe', 'psd']
+    excep = ['exe', 'psd', 'thm']
     return get_extensions(file_name) in excep
 
 
@@ -77,7 +77,7 @@ def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
     list_dir - [root - путь к файлу, file - имя файла]
     finish_dir - куда сохранить файлы.
     """
-    for root, file in tqdm(list_dir, ncols=80):
+    for root, file in tqdm(list_dir, ncols=80, desc='Copy'):
         path = os.path.join(root, file)
         copy_path = os.path.join(finish_dir, file)
 
@@ -148,7 +148,6 @@ def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
     start_path_file_name = get_list_acceptable_files(start_dir=start_path)
     copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
-    # copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
@@ -156,7 +155,7 @@ def work(start_path: str, finish_path: str) -> None:
     os.chdir(finish_path)
 
     for root, dirs, files in os.walk("."):
-        for file in files:
+        for file in tqdm(files, ncols=80, desc='Move'):
             # Получаем метаданные с фото.
             metadates_true = _checking_metadata(file_name=file)
             if metadates_true:
