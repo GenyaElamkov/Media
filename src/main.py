@@ -23,7 +23,7 @@ from datetime import datetime
 
 from PIL import ExifTags
 from PIL import Image
-from tqdm import tqdm
+
 
 def create_directory(dir_name: str) -> None:
     """
@@ -55,11 +55,14 @@ def progress_bar() -> None:
     Показываем прогресс бар.
     """
 
-def test(start_dir: str) -> list:
-    for root, dirs, files in os.walk(start_dir):
-        arr_file = [file for file in files if not _set_except_extensions(file)]
 
-    return arr_file
+def get_list_acceptable_files(start_dir: str) -> list:
+    """
+    Создаём лист допустимых файлов.
+    """
+    for root, dirs, files in os.walk(start_dir):
+        return [file for file in files if not _set_except_extensions(file)]
+
 
 def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
     """
@@ -112,9 +115,8 @@ def _checking_metadata(file_name: str) -> bool:
 
 def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
-    test(start_dir=start_path)
+    get_list_acceptable_files(start_dir=start_path)
     copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
-
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
