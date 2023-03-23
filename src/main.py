@@ -56,22 +56,55 @@ def progress_bar() -> None:
     """
 
 
-def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+def get_list_acceptable_files(start_dir: str) -> list:
     """
-    Копируем файлы в директорию.
+    Получаем список разрешенных файлов.
+    :return [root - путь к файлу, file - имя файла]
     """
+    arr = []
     for root, dirs, files in os.walk(start_dir):
         for file in files:
             if not _set_except_extensions(file):
-                path = os.path.join(root, file)
-                copy_path = os.path.join(finish_dir, file)
+                arr.append([root, file])
+    return arr
 
-                if os.path.isfile(copy_path):
-                    new_name = str(len(os.listdir(finish_dir))) + file
-                    copy_path = os.path.join(finish_dir, new_name)
 
-                # Проверяем на расширения из списка исключений.
-                shutil.copy2(path, copy_path)
+def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
+    """
+    Копируем файлы в директорию.
+    list_dir - [root - путь к файлу, file - имя файла]
+    finish_dir - куда сохранить файлы.
+    """
+    for root, file in list_dir:
+        print(root, file)
+        path = os.path.join(root, file)
+        copy_path = os.path.join(finish_dir, file)
+
+        if os.path.isfile(copy_path):
+            new_name = str(len(os.listdir(finish_dir))) + file
+            copy_path = os.path.join(finish_dir, new_name)
+
+        # Копируем файлы.
+        shutil.copy2(path, copy_path)
+
+
+# def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
+#     """
+#     Копируем файлы в директорию.
+#     """
+#     for root, dirs, files in os.walk(start_dir):
+#         for file in files:
+#             # Проверяем на расширения из списка исключений.
+#             if not _set_except_extensions(file):
+#                 path = os.path.join(root, file)
+#                 copy_path = os.path.join(finish_dir, file)
+#
+#                 if os.path.isfile(copy_path):
+#                     new_name = str(len(os.listdir(finish_dir))) + file
+#                     copy_path = os.path.join(finish_dir, new_name)
+#
+#                 # Копируем файлы.
+#                 shutil.copy2(path, copy_path)
 
 
 def get_dates(file_name: str) -> datetime:
@@ -107,7 +140,8 @@ def _checking_metadata(file_name: str) -> bool:
 
 def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
-    copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
+    start_path_file_name = get_list_acceptable_files(start_dir=start_path)
+    copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
