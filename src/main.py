@@ -1,22 +1,29 @@
 """
-Скрипт копирует фотографии в установленную папку (NewFolder).
-Раскладывает по годам и месяцам.
-Информацию берез из метаданных файла: дата съемки.
-Если отсутствует дата съемки, то время последней модификации
-файла (дата создания).
+Раскладывает файлы (фото, видео) по годам и месяцам.
+
+Этот скрипт раскладывает файлы (фото, видео) по директориям:
+- Создает основную директорию (NewFolder_data).
+    Где data создания этой директории.
+- Копирует файлы в эту директорию.
+- Вытаскивает из файлов год и месяц (дата съемки или дата создания).
+- Создает в директории (NewFolder_data) директории (год)
+    и в директории (год) создает (месяц).
+- Копированные файлы переносит по созданным директориям.
+
 --Help--
-Разместите скрипт в корне каталога.
-В корне каталога фотографии должны находится в директориях (папках).
+Разместите скрипт в корне директории.
+В корне директории файлы должны находится в директориях (папках)
 """
 
 import locale
 import os
 import shutil
+import sys
 from datetime import datetime
 
 from PIL import ExifTags
 from PIL import Image
-
+from tqdm import tqdm
 
 def create_directory(dir_name: str) -> None:
     """
@@ -34,7 +41,7 @@ def get_extensions(file_name: str) -> str:
     return file_name.split('.')[-1].lower()
 
 
-def set_except_extensions(file_name) -> bool:
+def _set_except_extensions(file_name) -> bool:
     """
     Устанавливаем исключения для расширений.
     Расширения в этом списке не копируются.
@@ -42,6 +49,17 @@ def set_except_extensions(file_name) -> bool:
     excep = ['exe', 'psd']
     return get_extensions(file_name) in excep
 
+
+def progress_bar() -> None:
+    """
+    Показываем прогресс бар.
+    """
+
+def test(start_dir: str) -> list:
+    for root, dirs, files in os.walk(start_dir):
+        arr_file = [file for file in files if not _set_except_extensions(file)]
+
+    return arr_file
 
 def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
     """
@@ -57,7 +75,7 @@ def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
                 copy_path = os.path.join(finish_dir, new_name)
 
             # Проверяем на расширения из списка исключений.
-            if not set_except_extensions(file):
+            if not _set_except_extensions(file):
                 shutil.copy2(path, copy_path)
 
 
@@ -94,7 +112,9 @@ def _checking_metadata(file_name: str) -> bool:
 
 def work(start_path: str, finish_path: str) -> None:
     # Копируем файлы.
+    test(start_dir=start_path)
     copy_file_in_dir(start_dir=start_path, finish_dir=finish_path)
+
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
@@ -103,16 +123,15 @@ def work(start_path: str, finish_path: str) -> None:
 
     for root, dirs, files in os.walk("."):
         for file in files:
-            path = os.path.join(root, file)
             # Получаем метаданные с фото.
-            metadates_true = _checking_metadata(file_name=path)
+            metadates_true = _checking_metadata(file_name=file)
             if metadates_true:
-                dt = datetime.strptime(get_metadates(file_name=path), pattern)
+                dt = datetime.strptime(get_metadates(file_name=file), pattern)
                 year = str(dt.year)
                 month = dt.strftime("%B")
             else:
-                year = get_dates(path).strftime("%Y")
-                month = get_dates(path).strftime("%B")
+                year = get_dates(file).strftime("%Y")
+                month = get_dates(file).strftime("%B")
 
             create_directory(year)
             os.chdir(year)
@@ -129,14 +148,22 @@ def work(start_path: str, finish_path: str) -> None:
 
 def main() -> None:
     # Текущая директория.
-    # start_path = r"C:\Users\User\Desktop\фото_Еська"
-    start_path = os.getcwd()
+    # Тестовый путь
+    start_path = r"C:\Users\User\Desktop\фото_Еська"
+    # Путь для pruduct.
+    # start_path = os.getcwd()
     os.chdir(start_path)
 
     # Директория куда складываем файлы.
     dts_now = datetime.now().date().strftime('%d.%m.%Y')
     finish_dir = 'NewFolder' + f"_{dts_now}"
+    # Проверяем на существование основной директории.
+    finish_dir_true = os.path.isdir(finish_dir)
+    if finish_dir_true:
+        sys.exit('[!] Директория существует')
+
     create_directory(finish_dir)
+
     finish_path = os.path.join(start_path, finish_dir)
 
     work(start_path, finish_path)
