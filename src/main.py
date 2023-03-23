@@ -52,12 +52,6 @@ def _set_except_extensions(file_name) -> bool:
     return get_extensions(file_name) in excep
 
 
-def progress_bar() -> None:
-    """
-    Показываем прогресс бар.
-    """
-
-
 def get_list_acceptable_files(start_dir: str) -> list:
     """
     Получаем список разрешенных файлов.
@@ -88,25 +82,6 @@ def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
         # Копируем файлы.
         shutil.copy2(path, copy_path)
 
-
-# def copy_file_in_dir(start_dir: str, finish_dir: str) -> None:
-#     """
-#     Копируем файлы в директорию.
-#     """
-#     for root, dirs, files in os.walk(start_dir):
-#         for file in files:
-#             # Проверяем на расширения из списка исключений.
-#             if not _set_except_extensions(file):
-#                 path = os.path.join(root, file)
-#                 copy_path = os.path.join(finish_dir, file)
-#
-#                 if os.path.isfile(copy_path):
-#                     new_name = str(len(os.listdir(finish_dir))) + file
-#                     copy_path = os.path.join(finish_dir, new_name)
-#
-#                 # Копируем файлы.
-#                 shutil.copy2(path, copy_path)
-#
 
 def get_dates(file_name: str) -> datetime:
     """
@@ -180,9 +155,7 @@ def work(start_path: str, finish_path: str) -> None:
 
 def main() -> None:
     # Текущая директория.
-    # Тестовый путь
     start_path = r"C:\Users\User\Desktop\test"
-    # Путь для pruduct.
     # start_path = os.getcwd()
     os.chdir(start_path)
 
