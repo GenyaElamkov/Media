@@ -152,8 +152,8 @@ def move_file(finish_path: str) -> None:
 
 def start_main() -> None:
     # Текущая директория.
-    start_path = r"C:\Users\User\Desktop\test"
-    # start_path = os.getcwd()
+    # start_path = r"C:\Users\User\Desktop\test"
+    start_path = os.getcwd()
     os.chdir(start_path)
 
     # Директория куда складываем файлы.
