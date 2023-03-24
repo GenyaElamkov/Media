@@ -1,38 +1,44 @@
 # -*- codng: utf8 -*-
-import os
+"""
+Раскладывает файлы (фото, видео) по годам и месяцам.
+
+Этот скрипт раскладывает файлы (фото, видео) по директориям:
+- Создает основную директорию (NewFolder_data).
+    Где data создания этой директории.
+- Копирует файлы в эту директорию.
+- Вытаскивает из файлов год и месяц (дата съемки или дата создания).
+- Создает в директории (NewFolder_data) директории (год)
+    и в директории (год) создает (месяц).
+- Копированные файлы переносит по созданным директориям.
+
+--Warning--
+Разместите скрипт в корне директории.
+В корне директории файлы должны находится в директориях (папках)
+"""
+
 import sys
 
-from art import *
 from colorama import init, Style, Fore
 
+from src import clear
+from src.description import txt_description, txt_warning, Art
 from src.main import start_main
 
 init()
 
-Art = text2art("media", font='block',
-               chr_ignore=True)
 print(Fore.GREEN + Art)
-
-txt_description = """Этот скрипт раскладывает файлы (фото, видео) по директориям.
-Файлы (фото, видео) хранятся в созданной директории.
-Имя директории: NewFolder + текущая дата.
-"""
-
 print(txt_description)
-
-txt_warning = """Внимание: Разместите скрипт в корне директории, где хотите отфильтровать.
-В корне директории файлы должны находится в директориях (папках)
-"""
 print(Fore.RED + txt_warning + Style.RESET_ALL)
 
 
 def main():
     start = input('Запустить скрипт (Y/N)(Д/Н): ').upper()
 
-    os.system('cls')
+    clear()
 
-    st_key = ('N', 'Н')
-    if start in st_key:
+    st_key = ('Y', 'Д')
+    if start not in st_key:
+        input(Fore.YELLOW + f'[!] Вы нажали клавишу: <<{start}>>')
         sys.exit('Good by!')
 
     print(Fore.YELLOW + '[Скрипт запущен]')
@@ -40,7 +46,7 @@ def main():
     start_main()
 
     print('[Скрипт закончил работу]')
-    input('Для выхода нажмите любую клавишу')
+
 
 if __name__ == '__main__':
     main()

@@ -1,20 +1,3 @@
-"""
-Раскладывает файлы (фото, видео) по годам и месяцам.
-
-Этот скрипт раскладывает файлы (фото, видео) по директориям:
-- Создает основную директорию (NewFolder_data).
-    Где data создания этой директории.
-- Копирует файлы в эту директорию.
-- Вытаскивает из файлов год и месяц (дата съемки или дата создания).
-- Создает в директории (NewFolder_data) директории (год)
-    и в директории (год) создает (месяц).
-- Копированные файлы переносит по созданным директориям.
-
---Warning--
-Разместите скрипт в корне директории.
-В корне директории файлы должны находится в директориях (папках)
-"""
-
 import locale
 import os
 import shutil
@@ -25,6 +8,8 @@ from PIL import ExifTags
 from PIL import Image
 from PIL import UnidentifiedImageError
 from tqdm import tqdm
+
+from src import clear
 
 
 def create_directory(dir_name: str) -> None:
@@ -52,14 +37,17 @@ def _set_except_extensions(file_name) -> bool:
     return get_extensions(file_name) in excep
 
 
-def get_list_acceptable_files(start_dir: str) -> list:
+def get_list_acceptable_files(start_dir: str) -> list[tuple]:
     """
     Получаем список разрешенных файлов.
     :return [root - путь к файлу, file - имя файла]
     """
+    arr = []
     for root, dirs, files in os.walk(start_dir):
-        return [(root, file) for file in files if
-                not _set_except_extensions(file)]
+        for file in files:
+            if not _set_except_extensions(file):
+                arr.append((root, file))
+    return arr
 
 
 def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
@@ -154,15 +142,18 @@ def start_main() -> None:
     # Текущая директория.
     # start_path = r"C:\Users\User\Desktop\test"
     start_path = os.getcwd()
-    os.chdir(start_path)
 
     # Директория куда складываем файлы.
     dts_now = datetime.now().date().strftime('%d.%m.%Y')
     finish_dir = 'NewFolder' + f"_{dts_now}"
+    os.chdir(start_path)
+
     # Проверяем на существование основной директории.
     finish_dir_true = os.path.isdir(finish_dir)
     if finish_dir_true:
-        sys.exit('[!] Директория существует')
+        clear()
+        input('[!] Директория существует')
+        sys.exit()
 
     create_directory(finish_dir)
 
