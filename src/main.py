@@ -10,7 +10,7 @@
     и в директории (год) создает (месяц).
 - Копированные файлы переносит по созданным директориям.
 
---Help--
+--Warning--
 Разместите скрипт в корне директории.
 В корне директории файлы должны находится в директориях (папках)
 """
@@ -57,12 +57,9 @@ def get_list_acceptable_files(start_dir: str) -> list:
     Получаем список разрешенных файлов.
     :return [root - путь к файлу, file - имя файла]
     """
-    arr = []
     for root, dirs, files in os.walk(start_dir):
-        for file in files:
-            if not _set_except_extensions(file):
-                arr.append([root, file])
-    return arr
+        return [(root, file) for file in files if
+                not _set_except_extensions(file)]
 
 
 def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
@@ -118,15 +115,15 @@ def _checking_metadata(file_name: str) -> bool:
            and get_metadates(file_name=file_name) is not None
 
 
-def work(start_path: str, finish_path: str) -> None:
-    # Копируем файлы.
-    start_path_file_name = get_list_acceptable_files(start_dir=start_path)
-    copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
+def move_file(finish_path: str) -> None:
+    """
+    Создаём директории по годам и месяцам.
+    Перемещаем файлы в созданные директории.
+    """
+    os.chdir(finish_path)
 
     locale.setlocale(category=locale.LC_ALL, locale="Russian")
     pattern = '%Y:%m:%d %H:%M:%S'
-
-    os.chdir(finish_path)
 
     for root, dirs, files in os.walk("."):
         for file in tqdm(files, ncols=80, desc='Move'):
@@ -153,7 +150,7 @@ def work(start_path: str, finish_path: str) -> None:
                 print('[!] Файл перенесен')
 
 
-def main() -> None:
+def start_main() -> None:
     # Текущая директория.
     start_path = r"C:\Users\User\Desktop\test"
     # start_path = os.getcwd()
@@ -170,9 +167,12 @@ def main() -> None:
     create_directory(finish_dir)
 
     finish_path = os.path.join(start_path, finish_dir)
-
-    work(start_path, finish_path)
+    # Копируем файлы.
+    start_path_file_name = get_list_acceptable_files(start_dir=start_path)
+    copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
+    # Перемещаем файлы.
+    move_file(finish_path)
 
 
 if __name__ == '__main__':
-    main()
+    start_main()
