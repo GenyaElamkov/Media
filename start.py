@@ -33,7 +33,6 @@ print(txt_description)
 print(Fore.RED + txt_warning + Style.RESET_ALL)
 
 
-
 def main():
     print(Fore.YELLOW)
     difference_place_disk_free()

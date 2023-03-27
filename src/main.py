@@ -12,6 +12,7 @@ from tqdm import tqdm
 from src import clear
 from src import start_path
 
+
 def create_directory(dir_name: str) -> None:
     """
     Создаём директорию.
