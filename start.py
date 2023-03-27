@@ -24,6 +24,8 @@ from src import clear
 from src.description import txt_description, txt_warning, Art
 from src.main import start_main
 
+from src.disc_space import difference_place_disk_free
+
 init()
 
 print(Fore.GREEN + Art)
@@ -31,7 +33,12 @@ print(txt_description)
 print(Fore.RED + txt_warning + Style.RESET_ALL)
 
 
+
 def main():
+    print(Fore.YELLOW)
+    difference_place_disk_free()
+    print(Style.RESET_ALL)
+
     start = input('Запустить скрипт (Y/N)(Д/Н): ').upper()
 
     clear()

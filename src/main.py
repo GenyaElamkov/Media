@@ -10,7 +10,7 @@ from PIL import UnidentifiedImageError
 from tqdm import tqdm
 
 from src import clear
-
+from src import start_path
 
 def create_directory(dir_name: str) -> None:
     """
@@ -138,10 +138,13 @@ def move_file(finish_path: str) -> None:
                 print('[!] Файл перенесен')
 
 
+start_path_file_name = get_list_acceptable_files(start_dir=start_path)
+
+
 def start_main() -> None:
     # Текущая директория.
     # start_path = r"C:\Users\User\Desktop\test"
-    start_path = os.getcwd()
+    # start_path = os.getcwd()
 
     # Директория куда складываем файлы.
     dts_now = datetime.now().date().strftime('%d.%m.%Y')
@@ -159,7 +162,7 @@ def start_main() -> None:
 
     finish_path = os.path.join(start_path, finish_dir)
     # Копируем файлы.
-    start_path_file_name = get_list_acceptable_files(start_dir=start_path)
+    # start_path_file_name = get_list_acceptable_files(start_dir=start_path)
     copy_file_in_dir(list_dir=start_path_file_name, finish_dir=finish_path)
     # Перемещаем файлы.
     move_file(finish_path)
