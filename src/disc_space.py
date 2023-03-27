@@ -36,14 +36,17 @@ def difference_place_disk_free() -> None:
     free = get_disk_usage(start_path)
     resoult = free - usage
 
-    gb = 2 ** 30
+    # gb = 2 ** 30
+    # Байт в мегабайте.
+    mb = 1048576
     largest_space = 0
 
+
     if resoult <= largest_space:
-        input(f'[!] Мало места, нужно {usage / gb:.0f}')
+        input(f'[!] Мало места, нужно {usage / mb:.0f} мб')
         sys.exit()
     else:
-        print(f'Используются места: {usage / 1024:.0f}кб')
+        print(f'Используются места: {usage / mb:.0f} мб')
 
 
 if __name__ == '__main__':
