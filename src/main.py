@@ -12,7 +12,7 @@ from tqdm import tqdm
 from src import clear
 from src import start_path
 
-from src.description import fileNotFoundError, directory_exists
+from src.media.description import fileNotFoundError, directory_exists
 
 
 def create_directory(dir_name: str) -> None:

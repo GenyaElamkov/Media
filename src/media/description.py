@@ -1,3 +1,7 @@
+"""
+Текстовый модуль.
+"""
+
 from art import text2art
 
 Art = text2art("media", font='block',

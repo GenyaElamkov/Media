@@ -21,10 +21,10 @@ import sys
 from colorama import init, Style, Fore
 
 from src import clear
-from src.description import txt_description, txt_warning, Art
+from src.media.description import txt_description, txt_warning, Art
 from src.main import start_main
 
-from src.disc_space import difference_place_disk_free
+from src.media.disc_space import difference_place_disk_free
 
 init()
 
