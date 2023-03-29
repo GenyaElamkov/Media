@@ -34,7 +34,8 @@ def show_difference_disk(files_name: list[tuple],
     largest_space = 0
 
     if resoult <= largest_space:
-        input(f'[!] Мало места, нужно {usage / mb:.0f} мб')
+        input(f'[!] Мало места, нужно {usage / mb:.0f} мб. '
+              f'Для выхода нажмите <Enter>...')
         sys.exit()
     else:
         print(f'Используются места: {usage / mb:.0f} мб')

@@ -71,7 +71,8 @@ def show_window() -> None:
 
     st_key = ('Y', 'Д')
     if start not in st_key:
-        input(Fore.YELLOW + f'[!] Вы нажали клавишу: <<{start}>>')
+        input(Fore.YELLOW + f'[!] Вы нажали клавишу: <<{start}>>. '
+                            f'Для выхода нажмите <Enter>...')
         sys.exit('Good by!')
 
     print(Fore.YELLOW + '[Скрипт запущен]')
