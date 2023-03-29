@@ -12,6 +12,7 @@ from src import start_path
 from src.main import start_path_file_name
 
 
+
 def get_folder_usage(files: list[tuple]) -> int:
     """
     Возращает количество байтов в директориях, где лежат файлы.

@@ -12,6 +12,8 @@ from tqdm import tqdm
 from src import clear
 from src import start_path
 
+from src.description import fileNotFoundError, directory_exists
+
 
 def create_directory(dir_name: str) -> None:
     """
@@ -136,7 +138,7 @@ def move_file(finish_path: str) -> None:
             try:
                 shutil.move(file, os.path.join(year, month, file))
             except FileNotFoundError:
-                print('[!] Файл перенесен')
+                print(fileNotFoundError)
 
 
 start_path_file_name = get_list_acceptable_files(start_dir=start_path)
@@ -156,7 +158,7 @@ def start_main() -> None:
     finish_dir_true = os.path.isdir(finish_dir)
     if finish_dir_true:
         clear()
-        input('[!] Директория существует')
+        input(directory_exists)
         sys.exit()
 
     create_directory(finish_dir)
