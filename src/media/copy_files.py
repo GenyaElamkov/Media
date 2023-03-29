@@ -8,7 +8,7 @@ import shutil
 from tqdm import tqdm
 
 
-def copy_file_in_dir(list_dir: list, finish_dir: str) -> None:
+def copy_file_in_dir(list_dir: list[tuple], finish_dir: str) -> None:
     """
     Копируем файлы в директорию.
     list_dir - [root - путь к файлу, file - имя файла]

@@ -21,7 +21,6 @@ def get_metadates(file_name: str) -> str | None:
     """
     Получаем дату метаданных файла.
     """
-
     try:
         with Image.open(file_name) as img:
             exif = {
@@ -34,7 +33,7 @@ def get_metadates(file_name: str) -> str | None:
         return None
 
 
-def _checking_metadata(file_name: str) -> bool:
+def checking_metadata(file_name: str) -> bool:
     """
     Проверка файла на метаданные.
     list_extensions - список расширений для метаданных.
@@ -74,7 +73,7 @@ def move_file(finish_path: str) -> None:
     for root, dirs, files in os.walk("."):
         for file in tqdm(files, ncols=80, desc='Move'):
             # Получаем метаданные с фото.
-            metadates_true = _checking_metadata(file_name=file)
+            metadates_true = checking_metadata(file_name=file)
             if metadates_true:
                 dt = datetime.strptime(get_metadates(file_name=file), pattern)
                 year = str(dt.year)

@@ -20,21 +20,15 @@ def get_folder_usage(files: list[tuple]) -> int:
     return size
 
 
-def get_disk_usage(path: str) -> int:
-    return disk_usage(path).free
-
-
-def difference_place_disk_free(files_name: list[tuple],
-                               start_path: str) -> None:
+def show_difference_disk(files_name: list[tuple],
+                         start_path: str) -> None:
     """
     Получаем разницу в гб между оставшимся местом и используемым в файлах.
     """
-
     usage = get_folder_usage(files_name)
-    free = get_disk_usage(start_path)
+    free = disk_usage(start_path).free
     resoult = free - usage
 
-    # gb = 2 ** 30
     # Байт в мегабайте.
     mb = 1048576
     largest_space = 0

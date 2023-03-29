@@ -11,7 +11,7 @@ def get_extensions(file_name: str) -> str:
     return file_name.split('.')[-1].lower()
 
 
-def _set_except_extensions(file_name) -> bool:
+def set_except_extensions(file_name) -> bool:
     """
     Устанавливаем исключения для расширений.
     Расширения в этом списке не копируются.
@@ -28,6 +28,6 @@ def get_list_acceptable_files(start_dir: str) -> list[tuple]:
     arr = []
     for root, dirs, files in os.walk(start_dir):
         for file in files:
-            if not _set_except_extensions(file):
+            if not set_except_extensions(file):
                 arr.append((root, file))
     return arr
