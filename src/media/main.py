@@ -64,7 +64,6 @@ def show_window() -> None:
     show_difference_disk(files_name=files_name, start_path=start_path)
     print(Style.RESET_ALL)
 
-    # print(Style.RESET_ALL)
     start = input('Запустить скрипт (Y/N)(Д/Н): ').upper()
 
     clear()
